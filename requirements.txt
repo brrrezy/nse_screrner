@@ -5,5 +5,6 @@ requests
 tqdm
 ta
 openpyxl
-streamlit
+streamlit>=1.31.0
 altair>=4,<5
+standard-imghdr
