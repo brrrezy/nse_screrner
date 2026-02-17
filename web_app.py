@@ -3,6 +3,7 @@ import pathlib
 import streamlit as st
 
 from swing_screener import run_full_system
+import inspect
 
 
 st.set_page_config(
@@ -55,14 +56,21 @@ placeholder = st.empty()
 
 if run_button:
     with st.spinner("Running NSE swing screener... this can take a few minutes for large universes."):
-        top_df = run_full_system(
+        kwargs = dict(
             universe_limit=universe_limit,
             min_confluence_score=min_score,
             period=period,
             interval=interval,
             top_n=top_n,
-            start_index=start_index,
         )
+        # Backward/forward compatible with different `swing_screener.py` versions
+        params = set(inspect.signature(run_full_system).parameters.keys())
+        if "start_index" in params:
+            kwargs["start_index"] = start_index
+        elif "start" in params:
+            kwargs["start"] = start_index
+
+        top_df = run_full_system(**kwargs)
 
     if top_df is None or top_df.empty:
         st.warning("No candidates produced (even after fallback scoring). Try lowering minimum score or shortening period.")
