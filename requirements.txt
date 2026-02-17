@@ -7,4 +7,3 @@ ta
 openpyxl
 streamlit
 altair>=4,<5
-imghdr
