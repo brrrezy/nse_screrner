@@ -73,7 +73,20 @@ if run_button:
         top_df = run_full_system(**kwargs)
 
     if top_df is None or top_df.empty:
-        st.warning("No candidates produced (even after fallback scoring). Try lowering minimum score or shortening period.")
+        summary = {}
+        err = None
+        if isinstance(top_df, object):
+            try:
+                summary = getattr(top_df, "attrs", {}).get("summary", {}) or {}
+                err = getattr(top_df, "attrs", {}).get("error")
+            except Exception:
+                pass
+
+        if err:
+            st.error(err)
+        st.warning("No candidates produced. See scan summary below.")
+        if summary:
+            st.json(summary)
     else:
         st.subheader("Top Candidates")
         st.dataframe(top_df, use_container_width=True)
